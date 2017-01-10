@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +35,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import io.github.getsmp.lorforandroid.LOR;
 import io.github.getsmp.lorforandroid.R;
 import io.github.getsmp.lorforandroid.api.ApiManager;
 import io.github.getsmp.lorforandroid.api.model.Topic;
@@ -48,6 +48,7 @@ import io.github.getsmp.lorforandroid.util.StringUtils;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import su.whs.watl.ui.TextViewEx;
 
 public class TopicFragment extends LoadableFragment {
     @Bind(R.id.topicScrollView) NestedScrollView scrollView;
@@ -56,7 +57,7 @@ public class TopicFragment extends LoadableFragment {
     @Bind(R.id.topicAuthor) TextView author;
     @Bind(R.id.topicDate) TextView date;
     @Bind(R.id.topicImage) @Nullable ImageView image;
-    @Bind(R.id.topicMessage) TextView message;
+    @Bind(R.id.topicMessage) TextViewEx message;
     private String url;
     private String imageUrl;
     private Topic topic;
@@ -84,6 +85,12 @@ public class TopicFragment extends LoadableFragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_topic, container, false);
         ButterKnife.bind(this, view);
+        message.getOptions()
+                .setFilterEmptyLines(true)
+                .setDrawableMinimumScaleFactor(.3f)
+                .setLineBreaker(LOR.from(getActivity()).getLineBreaker())
+                .setNewLineTopMargin(4)
+                .setNewLineLeftMargin(8);
         return view;
     }
 
@@ -149,7 +156,8 @@ public class TopicFragment extends LoadableFragment {
         author.setText(topic.getAuthor().getNick());
         date.setText(DateUtils.getDate(topic.getPostDate()));
         message.setText(Html.fromHtml(topic.getMessage()));
-        message.setMovementMethod(LinkMovementMethod.getInstance());
+        // FIXME: removed due to this method reset text to null
+//        message.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     private void loadImageAndSetImageActivityListener() {
